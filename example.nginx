@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name blog.example.org;
+
+    location / {
+        try_files $uri $uri/ /blog.cgi;
+    }
+    
+}
