@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use CGI;
+
 my $q = new CGI;
 
 # =====================CONFIG======================
@@ -12,8 +13,14 @@ my $ROOT = "/trashyard/";
 my $url = $ENV{REQUEST_URI};
 
 sub read_file($);
+sub file_to_arr($);
+sub get_title($);
 
-print $q->header("application/xhtml+xml");
+print $q->header(
+    -type       => 'application/xhtml+xml',
+    -charset    => 'utf-8',
+);
+
 my @entries = reverse glob("*.txt"); # Get all entries
 
 $url =~ s/index\.cgi//;
@@ -31,7 +38,7 @@ if ($url eq $ROOT) {
 	print "</ul>\n";
 } else {
 	my $file = $url;
-	$file =~ s/$ROOT//;
+	$file =~ s/$ROOT///;
 	if(!-e $file . ".txt") {
 		print $q->h1("This is a 404...");
 		print "<a href=\"./\">Go back to the index?</a>";
@@ -46,7 +53,7 @@ read_file("footer.html");
 sub read_file($) {
 	my $file = shift;
 	open(my $fh, "<$file");
-	print while <$fh>;
+     print while <$fh>;
 	close $fh;
 }
 sub file_to_arr($) {

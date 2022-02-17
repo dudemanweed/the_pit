@@ -30,5 +30,7 @@ following naming scheme: =yyyymmdd.whatever.txt= "whatever" can be
 whatever or can be nothing. Drop the files in the blogroot and the_pit
 will do the rest.
 
-You may edit the footer.html and header.html according to your needs.
+You may edit the =footer.html= and =header.html= according to your
+needs. And you can put whatever info you want in =notes.html=. These
+files are hardcoded in the perl script.
 
