@@ -2,6 +2,8 @@
 
 use CGI;
 use POSIX qw(strftime);
+use Text::MultiMarkdown 'markdown';
+
 my $q = new CGI;
 
 print "Content-Type: application/rss+xml\n\n";
@@ -30,13 +32,12 @@ foreach my $filename (reverse glob("*.txt")) {
 	print "<item>\n";
 	print "<title>"; print get_title($filename); print "</title>\n";
 	print "<date>\n"; print get_date($filename); print "</date>\n";
-	print "<link>\nhttp://$ENV{HTTP_HOST}/blog/$_\n</link>\n";
-	print "<description>";
-	print print_file($filename);
-	print "</description>";
+	print "<link>\nhttp://$ENV{HTTP_HOST}/blog/$filename\n</link>\n";
+	print "<description>\n";
+	print_file($filename);
+	print "</description>\n";
 	print "</item>\n";
 	last if $limit == ++$i;
-	
 }
 
 print <<EOF;
@@ -50,11 +51,12 @@ sub print_file($) {
 	open $fh, "<$file";
 	my @file;
 	while (<$fh>) {
-		chomp($_);
-		$_ .= "&lt;br&gt;";
+		#$_ .= "&lt;br&gt;";
 		push @file, $_;
 	}
-	print @file;
+	close $fh;
+	print markdown(join('', @file));
+
 }
 
 sub get_date($) {
@@ -72,12 +74,14 @@ sub file_to_arr($) {
 		push @file, $_;
 	}
 	return @file;
+	close $fh;
 }
 
 sub get_title($) {
 	my $file = shift;
 	my @file = file_to_arr($file);
 	my $line = $file[0];
+	# Remove trailing whitespaces
 	$line =~ s/^\s*(.*?)\s*$/$1/;
 	return $line;
 }
