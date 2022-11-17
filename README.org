@@ -24,6 +24,7 @@ work under nginx.
 - Written in perl instead of python.
 - RSS
 - Depends on =CGI= only    
+  
 ** HOW TO USE
 After installing the_pit, you only drop files which have to have the
 following naming scheme: =yyyymmdd.whatever.txt= "whatever" can be
@@ -33,4 +34,5 @@ will do the rest.
 You may edit the =footer.html= and =header.html= according to your
 needs. And you can put whatever info you want in =notes.html=. These
 files are hardcoded in the perl script.
-
+** LICENSE
+Public domain.
