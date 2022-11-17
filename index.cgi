@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
 
-# Remove if you're not using OpenBSD.
+# Change this line if using perl >= 5.36 to 5.36 and remove the "use
+# experimental" line.
+use v5.32;
 
-use OpenBSD::Unveil;
-use OpenBSD::Pledge;
+use experimental 'signatures';
 use POSIX qw(strftime);
 use Date::Parse;
 use Text::MultiMarkdown 'markdown';
@@ -17,12 +18,6 @@ my $ROOT = "/blog/";
 # =====================END CONFIG==================
 
 my $url = $ENV{REQUEST_URI};
-
-sub read_file($$$);
-
-# Remove if you're not using OpenBSD.
-unveil(".","r");
-pledge("rpath");
 
 use CGI;
 
@@ -64,8 +59,7 @@ if ($url eq $ROOT || $url eq "/blog") {
 }
 read_file("footer.html","",0);
 
-sub read_file($$$) {
-	my ($file, $title, $markdown) = @_;
+sub read_file($file, $title, $markdown) {
 	my $printable;
 	my @contents;
 	open(my $fh, "<$file");
@@ -81,9 +75,8 @@ sub read_file($$$) {
 	}
 	close $fh;
 }
-sub file_to_arr($) {
-	my $file = shift;
-	open $fh, "<$file";
+sub file_to_arr($file) {
+	open my $fh, "<$file";
 	my @file;
 	while (<$fh>) {
 		push @file, $_;
@@ -91,8 +84,7 @@ sub file_to_arr($) {
 	return @file;
 }
 
-sub get_title($) {
-	my $file = shift;
+sub get_title($file) {
 	my @file = file_to_arr($file);
 	my $line = $file[0];
 	$line =~ s/^\s*(.*?)\s*$/$1/;

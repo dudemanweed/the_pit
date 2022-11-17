@@ -3,8 +3,10 @@
 use CGI;
 use POSIX qw(strftime);
 use Text::MultiMarkdown 'markdown';
-
+use v5.32;
 my $q = new CGI;
+
+use experimental 'signatures';
 
 print "Content-Type: application/rss+xml\n\n";
 
@@ -17,13 +19,6 @@ print <<HERE;
 <link>https://suragu/blog</link>
 <description>Allah I thank, my mind went blank</description>
 HERE
-
-# Prototypes
-
-sub get_title($);
-sub get_title($);
-sub get_date($);
-sub print_file($);
 
 # Only show the latest 4 posts
 my $limit = 4;
@@ -45,10 +40,8 @@ print <<EOF;
 </rss>
 EOF
 
-sub print_file($) {
-
-	my $file = shift;
-	open $fh, "<$file";
+sub print_file($file) {
+	open my $fh, "<$file";
 	my @file;
 	while (<$fh>) {
 		#$_ .= "&lt;br&gt;";
@@ -59,16 +52,14 @@ sub print_file($) {
 
 }
 
-sub get_date($) {
-	my $filename = shift;
+sub get_date($filename) {
 	my @stat_thing = stat($filename);
 	my $date = $stat_thing[9];
 	return strftime ("%a %b %e %H:%M:%S %Y", localtime($date)) . "\n";
 }
 
-sub file_to_arr($) {
-	my $file = shift;
-	open $fh, "<$file";
+sub file_to_arr($file) {
+	open my $fh, "<$file";
 	my @file;
 	while (<$fh>) {
 		push @file, $_;
@@ -77,8 +68,7 @@ sub file_to_arr($) {
 	close $fh;
 }
 
-sub get_title($) {
-	my $file = shift;
+sub get_title($file) {
 	my @file = file_to_arr($file);
 	my $line = $file[0];
 	# Remove trailing whitespaces
