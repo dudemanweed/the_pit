@@ -1,14 +1,13 @@
 #!/usr/bin/perl
 
-
-# Change this line if using perl >= 5.36 to 5.36 and remove the "use
-# experimental" line.
 use v5.32;
-
 use experimental 'signatures';
 use POSIX qw(strftime);
 use Date::Parse;
 use Text::MultiMarkdown 'markdown';
+use lib ".";
+use Util;
+
 my $q = new CGI;
 
 # =====================CONFIG======================
@@ -35,6 +34,7 @@ if ($url eq "/blog") {
 }
 read_file("header.html","Index",0) if $url eq $ROOT;
 read_file("notes.html","",0) if $url eq "/blog/";
+
 my $date;
 if ($url eq $ROOT || $url eq "/blog") {
 	print "<ul>\n";
@@ -42,7 +42,7 @@ if ($url eq $ROOT || $url eq "/blog") {
 		$link =~ s/\.txt//;
 		$date = str2time($link);
 		my $date_string = strftime("%B %d",localtime($date));
-		print "<li>$date_string: <a href=\"".$url . $link ."\">".get_title($link . ".txt") . "</a></li>\n";
+		print "<li>$date_string: <a href=\"".$url . $link ."\">".Util::get_title($link . ".txt") . "</a></li>\n";
 	}
 	print "</ul>\n";
 } else {
@@ -53,7 +53,7 @@ if ($url eq $ROOT || $url eq "/blog") {
 		print "<h2>That's a 404</h2>";
 		print "<a href=\"./blog/index.cgi\">Go back to the index?</a>";
 	} else {
-		read_file("header.html",get_title($file . ".txt"), 0);
+		read_file("header.html",Util::get_title($file . ".txt"), 0);
 		read_file($file . ".txt","",  1);
 	}
 }
@@ -73,20 +73,4 @@ sub read_file($file, $title, $markdown) {
 	} else {
 		print @contents;
 	}
-	close $fh;
-}
-sub file_to_arr($file) {
-	open my $fh, "<$file";
-	my @file;
-	while (<$fh>) {
-		push @file, $_;
-	}
-	return @file;
-}
-
-sub get_title($file) {
-	my @file = file_to_arr($file);
-	my $line = $file[0];
-	$line =~ s/^\s*(.*?)\s*$/$1/;
-	return $line;
 }

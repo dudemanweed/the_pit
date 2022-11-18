@@ -4,8 +4,12 @@ use CGI;
 use POSIX qw(strftime);
 use Text::MultiMarkdown 'markdown';
 use v5.32;
+use OpenBSD::Unveil;
+use OpenBSD::Pledge;
 my $q = new CGI;
 
+use lib ".";
+use Util;
 use experimental 'signatures';
 
 print "Content-Type: application/rss+xml\n\n";
@@ -20,13 +24,17 @@ print <<HERE;
 <description>Allah I thank, my mind went blank</description>
 HERE
 
+unveil(".","r");
+pledge("rpath");
+# Prototypes
+
 # Only show the latest 4 posts
 my $limit = 4;
 my $i = 0;
 foreach my $filename (reverse glob("*.txt")) {
 	print "<item>\n";
-	print "<title>"; print get_title($filename); print "</title>\n";
-	print "<date>\n"; print get_date($filename); print "</date>\n";
+	print "<title>"; print Util::get_title($filename); print "</title>\n";
+	print "<date>\n"; print Util::get_date($filename); print "</date>\n";
 	print "<link>\nhttp://$ENV{HTTP_HOST}/blog/$filename\n</link>\n";
 	print "<description>\n";
 	print_file($filename);
@@ -52,26 +60,3 @@ sub print_file($file) {
 
 }
 
-sub get_date($filename) {
-	my @stat_thing = stat($filename);
-	my $date = $stat_thing[9];
-	return strftime ("%a %b %e %H:%M:%S %Y", localtime($date)) . "\n";
-}
-
-sub file_to_arr($file) {
-	open my $fh, "<$file";
-	my @file;
-	while (<$fh>) {
-		push @file, $_;
-	}
-	return @file;
-	close $fh;
-}
-
-sub get_title($file) {
-	my @file = file_to_arr($file);
-	my $line = $file[0];
-	# Remove trailing whitespaces
-	$line =~ s/^\s*(.*?)\s*$/$1/;
-	return $line;
-}
